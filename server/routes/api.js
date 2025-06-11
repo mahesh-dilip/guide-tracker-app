@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { createGuide, getGuideById } from '../controllers/guideController.js';
+import { createGuide, getGuideById, createGuideFromAudio, exportGuide } from '../controllers/guideController.js';
 import { toggleStepCompletion, addNoteToStep, addAttachmentToStep } from '../controllers/stepController.js';
 
 // Create a new router object
@@ -10,13 +10,15 @@ const router = express.Router();
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: 25 * 1024 * 1024, // 25MB limit for audio files
   },
 });
 
 // Guide routes
-router.post('/guides', createGuide);
+router.post('/guides/from-text', createGuide); // Renamed for clarity
 router.get('/guides/:guideId', getGuideById);
+router.get('/guides/:guideId/export', exportGuide);
+router.post('/guides/from-audio', upload.single('audio'), createGuideFromAudio);
 
 // Step routes
 router.put('/guides/:guideId/steps/:stepId/complete', toggleStepCompletion);

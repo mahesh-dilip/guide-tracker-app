@@ -1,7 +1,17 @@
 import axios from 'axios';
 
 export const createGuideFromText = (rawContent) => {
-    return axios.post('/api/guides', { rawContent });
+    return axios.post('/api/guides/from-text', { rawContent });
+};
+
+export const createGuideFromAudio = (audioFile) => {
+    const formData = new FormData();
+    formData.append('audio', audioFile); // Key 'audio' must match backend
+    return axios.post('/api/guides/from-audio', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
 };
 
 export const getGuide = (guideId) => {
@@ -25,5 +35,12 @@ export const addAttachment = (guideId, stepId, file) => {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
+    });
+};
+
+export const exportGuideAs = (guideId, format) => {
+    // We expect a file back, so the responseType must be 'blob'
+    return axios.get(`/api/guides/${guideId}/export?format=${format}`, {
+        responseType: 'blob',
     });
 }; 

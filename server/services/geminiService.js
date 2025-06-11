@@ -15,8 +15,10 @@ async function getStructuredGuide(rawText) {
     Follow these instructions precisely:
 
     1.  **Analyze the Content:** Read the entire text to understand its purpose.
-    2.  **Determine the Content Type:** Categorize the content into one of the following: \`RECIPE\`, \`TECHNICAL_TUTORIAL\`, \`DIY_PROJECT\`, \`STUDY_GUIDE\`, or \`GENERAL\`.
-    3.  **Generate the JSON:** Create a single JSON object. Infer a concise \`title\` from the text. Logically divide the content into \`chapters\`. Break down each chapter into sequential \`steps\`. Each step should be a single, clear, actionable item. If there are no obvious chapters, create a single chapter with a suitable title like "Main Steps".
+    2.  **Translate:** if the text is in a language other than English, translate it into English first.
+    3.  **Determine the Content Type:** Categorize the content into one of the following: \`RECIPE\`, \`TECHNICAL_TUTORIAL\`, \`DIY_PROJECT\`, \`STUDY_GUIDE\`, or \`GENERAL\`.
+    4.  **Generate the JSON:** Create a single JSON object. Infer a concise \`title\` from the text. Logically divide the content into \`chapters\`. Break down each chapter into sequential \`steps\`. Each step should be a single, clear, actionable item. If there are no obvious chapters, create a single chapter with a suitable title like "Main Steps".
+   
 
     **Required JSON Format:**
     \`\`\`json
