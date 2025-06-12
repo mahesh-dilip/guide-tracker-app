@@ -68,7 +68,7 @@ export default function CreateGuideView() {
             <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Guide Tracker</h1>
           </div>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Transform your content into interactive, step-by-step guides that engage and educate your audience
+            Transform your content into interactive, step-by-step guides.
           </p>
           <div className="flex items-center justify-center gap-2 mt-4">
             <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">

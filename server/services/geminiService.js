@@ -5,45 +5,89 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 async function getStructuredGuide(rawText) {
   // Access your Gemini API key from the .env file
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
   // This is the detailed prompt we send to the AI.
   // It tells the AI exactly what to do and what format to use.
   const prompt = `
-    You are an expert content analysis and structuring engine. Your task is to analyze the user-provided text dump and convert it into a structured, clean JSON object.
+YouYou are a master content analysis and structuring engine. Your primary function is to meticulously analyze user-submitted text, which may be in any language, and transform it into a precise, well-structured JSON object that strictly follows the required schema.
 
-    Follow these instructions precisely:
+**Analysis & Transformation Rules:**
 
-    1.  **Analyze the Content:** Read the entire text to understand its purpose.
-    2.  **Translate:** if the text is in a language other than English, translate it into English first.
-    3.  **Determine the Content Type:** Categorize the content into one of the following: \`RECIPE\`, \`TECHNICAL_TUTORIAL\`, \`DIY_PROJECT\`, \`STUDY_GUIDE\`, or \`GENERAL\`.
-    4.  **Generate the JSON:** Create a single JSON object. Infer a concise \`title\` from the text. Logically divide the content into \`chapters\`. Break down each chapter into sequential \`steps\`. Each step should be a single, clear, actionable item. If there are no obvious chapters, create a single chapter with a suitable title like "Main Steps".
-   
+1.  **Translate to English:** Before any analysis, detect the language of the provided text. If it is not in English, translate the entire content into clear, fluent English. This includes handling text with a mix of languages.
+2.  **Categorize Content:** After translation, determine the most fitting category for the content from this list: \`RECIPE\`, \`TECHNICAL_TUTORIAL\`, \`DIY_PROJECT\`, \`STUDY_GUIDE\`, or \`GENERAL\`.
+3.  **Infer Title & Structure:** Infer a concise and descriptive \`title\`. Logically segment the content into \`chapters\` and then into sequential \`steps\`. A step should be a single, clear action. If no logical chapters exist, create a single chapter titled "Main Steps."
+4.  **Error Handling:** If the user's text is nonsensical, too short to be a guide, or cannot be structured, your entire response MUST be the following JSON object and nothing else: \`{"error": "Content is not a valid guide and cannot be processed."}\`.
 
-    **Required JSON Format:**
-    \`\`\`json
+**Required JSON Output Schema:**
+Your final output MUST be ONLY the raw JSON object, without any surrounding text or markdown formatting.
+
+<json_schema>
+{
+  "title": "A concise, inferred title for the guide",
+  "contentType": "The category you determined",
+  "chapters": [
     {
-      "title": "A concise, inferred title for the guide",
-      "contentType": "The category you determined",
-      "chapters": [
+      "title": "Title of the first chapter",
+      "steps": [
         {
-          "title": "Title of the first chapter",
-          "steps": [
-            {"content": "Content of the first step in this chapter."},
-            {"content": "Content of the second step in this chapter."}
-          ]
+          "content": "Content of the first step in this chapter."
         }
       ]
     }
-    \`\`\`
+  ]
+}
+</json_schema>
 
-    **Final Output:** Your final response must ONLY be the raw JSON object. Do not include any conversational text, explanations, or markdown formatting like \`\`\`json \`\`\` before or after the object.
+---
+**Example of Perfect Execution:**
 
-    **Here is the user's text dump:**
-    ---
-    ${rawText}
-    ---
-  `;
+<user_text>
+Spaghetti Carbonara recipe
+Ingredients: 200g spaghetti, 100g pancetta, 2 large eggs, 50g pecorino cheese, black pepper.
+Instructions:
+1. Cook the spaghetti.
+2. Fry the pancetta.
+3. Whisk eggs and cheese.
+4. Mix and serve.
+</user_text>
+
+<json_output>
+{
+  "title": "Spaghetti Carbonara Recipe",
+  "contentType": "RECIPE",
+  "chapters": [
+    {
+      "title": "Ingredients",
+      "steps": [
+        {"content": "200g spaghetti"},
+        {"content": "100g pancetta"},
+        {"content": "2 large eggs"},
+        {"content": "50g pecorino cheese"},
+        {"content": "black pepper"}
+      ]
+    },
+    {
+      "title": "Instructions",
+      "steps": [
+        {"content": "Cook the spaghetti."},
+        {"content": "Fry the pancetta."},
+        {"content": "Whisk eggs and cheese."},
+        {"content": "Mix and serve."}
+      ]
+    }
+  ]
+}
+</json_output>
+
+---
+
+**Now, process the following user-provided text:**
+
+<user_text>
+${rawText}
+</user_text>
+`;
 
   try {
     // Send the prompt to the Gemini API

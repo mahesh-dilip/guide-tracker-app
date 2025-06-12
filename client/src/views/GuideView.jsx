@@ -136,7 +136,7 @@ const GuideView = () => {
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 md:p-8 font-sans">
             <div className="mx-auto max-w-4xl">
             {/* Sticky Header */}
-            <div className="sticky top-0 bg-white/90 backdrop-blur-sm z-10 border-b border-gray-200 shadow-sm rounded-lg p-4 mb-8">
+            <div className="sticky top-0 bg-white z-20 border-b border-gray-200 shadow-md rounded-b-lg p-4 mb-8">
                 <div className="max-w-4xl mx-auto">
                     <div className="flex justify-between items-center mb-4">
                         <Button variant="outline" asChild>
