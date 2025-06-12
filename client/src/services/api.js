@@ -1,12 +1,15 @@
 import axios from 'axios';
 
-// The VITE_API_BASE_URL will be read from the Vercel environment variable in production.
-// Locally (in dev mode), it will be undefined, so we default to a relative path '/api'
-// which will use our Vite proxy.
-const API_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+// Get the base URL for the backend from the environment variable.
+const RENDER_BACKEND_URL = import.meta.env.VITE_API_BASE_URL;
+
+// If we are in production (VITE_API_BASE_URL is set), we construct the full URL.
+// Otherwise (in local development), we use a relative path for the Vite proxy.
+const API_URL = RENDER_BACKEND_URL ? `${RENDER_BACKEND_URL}/api` : '/api';
 
 export const createGuideFromText = (rawContent) => {
-    return axios.post(`${API_URL}/guides/from-text`, { rawContent });
+    // Correct endpoint is /guides
+    return axios.post(`${API_URL}/guides`, { rawContent });
 };
 
 export const createGuideFromAudio = (audioFile) => {
@@ -32,14 +35,10 @@ export const addNote = (guideId, stepId, content) => {
 };
 
 export const addAttachment = (guideId, stepId, file) => {
-    // We must use FormData to send files
     const formData = new FormData();
-    formData.append('file', file); // The key 'file' must match the backend route
-
+    formData.append('file', file);
     return axios.post(`${API_URL}/guides/${guideId}/steps/${stepId}/attachments`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' },
     });
 };
 
