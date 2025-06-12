@@ -9,20 +9,31 @@ import apiRoutes from './routes/api.js';
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-// --- IMPORTANT: CORS Configuration ---
+// --- IMPORTANT: Flexible CORS Configuration ---
 
-// This setup is more robust for deployment.
-// It explicitly tells the server to trust requests from your Vercel URL.
+// This setup allows for multiple specific origins.
+const allowedOrigins = [
+  'http://localhost:5173', // For local development
+  'https://guide-tracker-app.vercel.app' // Your Vercel URL
+];
+
 const corsOptions = {
-  // Replace this with your actual Vercel frontend URL
-  origin: 'https://guide-tracker-app.vercel.app/', 
-  optionsSuccessStatus: 200 // For legacy browser support
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  }
 };
 
 // Use the CORS middleware with our options
 app.use(cors(corsOptions));
 
-// This handles the "preflight" request that browsers send for complex requests (like POST)
+// This handles the "preflight" request
 app.options('*', cors(corsOptions)); 
 
 // --- End of CORS Configuration ---
