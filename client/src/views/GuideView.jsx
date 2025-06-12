@@ -3,6 +3,15 @@ import { useParams, Link } from 'react-router-dom';
 import { getGuide, toggleStep, addNote, addAttachment, exportGuideAs } from '../services/api';
 import ProgressBar from '../components/ProgressBar';
 
+// Import the UI components we just added
+import { Button } from "../components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
+import { Textarea } from "../components/ui/textarea"
+import { Badge } from "../components/ui/badge"
+
+// Import the icons
+import { FileText, Mic, Sparkles, Upload, Zap } from "lucide-react"
+
 const GuideView = () => {
     const { guideId } = useParams();
     const [guide, setGuide] = useState(null);
@@ -76,7 +85,7 @@ const GuideView = () => {
         try {
             await addNote(guideId, stepId, content);
             setNoteInputs(prev => ({ ...prev, [stepId]: '' }));
-            setAddingNoteStepId(null); // Reset add note mode
+            setAddingNoteStepId(null);
             fetchGuide();
         } catch (err) {
             setError('Failed to add note.');
@@ -87,15 +96,15 @@ const GuideView = () => {
         const file = event.target.files[0];
         if (!file) return;
 
-        setUploadingStep(stepId); // Show loading indicator for this step
+        setUploadingStep(stepId);
         try {
             await addAttachment(guideId, stepId, file);
-            fetchGuide(); // Refresh to show the new image
+            fetchGuide();
         } catch (err) {
             setError('Failed to upload file. Is it smaller than 5MB?');
             console.error(err);
         } finally {
-            setUploadingStep(null); // Hide loading indicator
+            setUploadingStep(null);
         }
     };
 
@@ -103,7 +112,6 @@ const GuideView = () => {
         setExportingFormat(format);
         try {
             const response = await exportGuideAs(guideId, format);
-            // Create a temporary link to trigger the download
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
@@ -125,43 +133,53 @@ const GuideView = () => {
     if (!guide) return <div className="p-8 text-center">No guide data found.</div>;
 
     return (
-        <div className="max-w-4xl mx-auto">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 md:p-8 font-sans">
+            <div className="mx-auto max-w-4xl">
             {/* Sticky Header */}
-            <div className="sticky top-0 bg-gray-100 z-10 border-b border-gray-200 shadow-sm">
-                <div className="max-w-4xl mx-auto p-4">
+            <div className="sticky top-0 bg-white/90 backdrop-blur-sm z-10 border-b border-gray-200 shadow-sm rounded-lg p-4 mb-8">
+                <div className="max-w-4xl mx-auto">
                     <div className="flex justify-between items-center mb-4">
-                        <Link to="/" className="text-blue-600 hover:underline">&larr; Back to Create</Link>
+                        <Button variant="outline" asChild>
+                            <Link to="/" className="flex items-center gap-1 text-blue-600 hover:underline">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                                Back
+                            </Link>
+                        </Button>
                         <div className="flex gap-2">
-                            <button 
+                            <Button
                                 onClick={() => handleExport('pdf')}
                                 disabled={exportingFormat === 'pdf'}
-                                className="text-sm bg-green-600 text-white font-semibold py-1 px-3 rounded-md hover:bg-green-700 disabled:bg-gray-400"
+                                variant="outline"
+                                className="text-sm text-green-600 border-green-300 hover:bg-green-50 hover:text-green-700"
                             >
                                 {exportingFormat === 'pdf' ? 'Exporting...' : 'Export as PDF'}
-                            </button>
-                            <button 
+                            </Button>
+                            <Button
                                 onClick={() => handleExport('markdown')}
                                 disabled={exportingFormat === 'markdown'}
-                                className="text-sm bg-gray-600 text-white font-semibold py-1 px-3 rounded-md hover:bg-gray-700 disabled:bg-gray-400"
+                                variant="outline"
+                                className="text-sm text-gray-600 border-gray-300 hover:bg-gray-50 hover:text-gray-700"
                             >
                                 {exportingFormat === 'markdown' ? 'Exporting...' : 'Export as MD'}
-                            </button>
+                            </Button>
                         </div>
                     </div>
 
-                    <h1 className="text-4xl font-extrabold text-gray-900 mb-2">{guide.title}</h1>
-                    <p className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full inline-block mb-4">{guide.contentType}</p>
+                    <h1 className="text-4xl font-extrabold text-slate-900 mb-2">{guide.title}</h1>
+                    <Badge variant="secondary" className="bg-gray-100 text-gray-700 border-gray-200 mb-4">
+                        {guide.contentType}
+                    </Badge>
 
                     {/* Centralized Progress Bar */}
                     <div className="mb-6">
                         <ProgressBar value={guide.progress} />
-                        <p className="text-right text-sm text-gray-600 mt-1">{Math.round(guide.progress || 0)}% Complete</p>
+                        <p className="text-right text-sm text-slate-600 mt-1">{Math.round(guide.progress || 0)}% Complete</p>
                     </div>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className="p-4 sm:p-8">
+            <div className="p-4 sm:p-8 pt-0">
                 {guide.chapters.map((chapter, chapterIndex) => (
                     <div key={chapter.id || chapterIndex} className="mb-12">
                         <h2 className="text-2xl font-bold text-blue-800 border-b-2 border-blue-500 pb-2 mb-6">{chapter.title}</h2>
@@ -183,38 +201,41 @@ const GuideView = () => {
                                     {/* Notes & Attachments Section */}
                                     <div className="ml-10 mt-6 pl-4 border-l-2 border-gray-200">
                                         <div className="bg-gray-50 p-4 rounded-md">
+                                            {/* Conditionally render notes/attachments area based on presence of content */}
                                             {(!step.notes || step.notes.length === 0) && (!step.attachments || step.attachments.length === 0) ? (
                                                 addingNoteStepId === step.id ? (
-                                                    <div className="flex gap-2 w-full">
-                                                        <input
-                                                            type="text"
+                                                    <div className="flex flex-col gap-3 w-full">
+                                                        <Textarea
                                                             value={noteInputs[step.id] || ''}
                                                             onChange={(e) => handleNoteInputChange(step.id, e.target.value)}
                                                             placeholder="Add a new note..."
-                                                            className="w-full text-base border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 py-3 px-4 mb-0"
+                                                            className="w-full text-base border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 py-3 px-4 resize-none min-h-[50px]"
                                                             autoFocus
                                                         />
-                                                        <button
-                                                            onClick={() => handleAddNote(step.id)}
-                                                            className="px-4 py-2 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                                                        >
-                                                            Add Note
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setAddingNoteStepId(null)}
-                                                            className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800"
-                                                        >
-                                                            Cancel
-                                                        </button>
+                                                        <div className="flex gap-2">
+                                                            <Button
+                                                                onClick={() => handleAddNote(step.id)}
+                                                                className="px-4 py-2 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                                                            >
+                                                                Add Note
+                                                            </Button>
+                                                            <Button
+                                                                onClick={() => setAddingNoteStepId(null)}
+                                                                variant="outline"
+                                                                className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800"
+                                                            >
+                                                                Cancel
+                                                            </Button>
+                                                        </div>
                                                     </div>
                                                 ) : (
                                                     <div className="flex gap-2">
-                                                        <button
+                                                        <Button
                                                             onClick={() => setAddingNoteStepId(step.id)}
                                                             className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600"
                                                         >
                                                             Add Note
-                                                        </button>
+                                                        </Button>
                                                         <input
                                                             type="file"
                                                             accept="image/*"
@@ -222,31 +243,46 @@ const GuideView = () => {
                                                             className="hidden"
                                                             ref={el => fileInputRef.current[step.id] = el}
                                                         />
-                                                        <button
+                                                        <Button
                                                             onClick={() => fileInputRef.current[step.id].click()}
                                                             disabled={uploadingStep === step.id}
+                                                            variant="outline"
                                                             className="px-3 py-1 text-sm bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 disabled:opacity-50"
                                                         >
                                                             + Add Image
-                                                        </button>
+                                                        </Button>
                                                     </div>
                                                 )
                                             ) : (
                                                 <>
                                                     {/* Notes Section */}
                                                     <div>
-                                                        <h4 className="font-semibold text-gray-600 text-sm mb-2">Notes:</h4>
+                                                        <h4 className="font-semibold text-slate-700 text-base mb-2">Notes:</h4>
                                                         {step.notes && step.notes.length > 0 ? (
-                                                            <ul className="list-disc list-inside mt-2 text-gray-700">
+                                                            <ul className="list-disc list-inside mt-2 text-slate-700">
                                                                 {step.notes.map((note) => (
                                                                     <li key={note.id} className="text-sm mb-1">{note.content}</li>
                                                                 ))}
                                                             </ul>
-                                                        ) : <p className="text-sm text-gray-400 mt-1">No notes yet.</p>}
+                                                        ) : <p className="text-sm text-slate-500 mt-1">No notes yet.</p>}
+                                                        <div className="mt-4 flex items-center gap-2">
+                                                            <Textarea
+                                                                value={noteInputs[step.id] || ''}
+                                                                onChange={(e) => handleNoteInputChange(step.id, e.target.value)}
+                                                                placeholder="Add a new note..."
+                                                                className="w-full text-base border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 py-3 px-4 resize-none min-h-[50px]"
+                                                            />
+                                                            <Button
+                                                                onClick={() => handleAddNote(step.id)}
+                                                                className="px-4 py-2 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                                                            >
+                                                                Add Note
+                                                            </Button>
+                                                        </div>
                                                     </div>
                                                     {/* Attachments Section */}
                                                     <div className="mt-6">
-                                                        <h4 className="font-semibold text-gray-600 text-sm mb-2">Attachments:</h4>
+                                                        <h4 className="font-semibold text-slate-700 text-base mb-2">Attachments:</h4>
                                                         {step.attachments && step.attachments.length > 0 ? (
                                                             <div className="mt-2 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
                                                                 {step.attachments.map(att => (
@@ -260,8 +296,25 @@ const GuideView = () => {
                                                                 ))}
                                                             </div>
                                                         ) : (
-                                                            <p className="text-sm text-gray-400 mt-1">No attachments yet.</p>
+                                                            <p className="text-sm text-slate-500 mt-1">No attachments yet.</p>
                                                         )}
+                                                        <div className="mt-4">
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                onChange={(e) => handleFileChange(e, step.id)}
+                                                                className="hidden"
+                                                                ref={el => fileInputRef.current[step.id] = el}
+                                                            />
+                                                            <Button
+                                                                onClick={() => fileInputRef.current[step.id].click()}
+                                                                disabled={uploadingStep === step.id}
+                                                                variant="outline"
+                                                                className="px-3 py-1 text-sm bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 disabled:opacity-50"
+                                                            >
+                                                                {uploadingStep === step.id ? 'Uploading...' : '+ Add Image'}
+                                                            </Button>
+                                                        </div>
                                                     </div>
                                                 </>
                                             )}
@@ -272,6 +325,7 @@ const GuideView = () => {
                         </ul>
                     </div>
                 ))}
+            </div>
             </div>
         </div>
     );
