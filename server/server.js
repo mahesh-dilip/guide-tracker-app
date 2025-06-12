@@ -9,9 +9,22 @@ import apiRoutes from './routes/api.js';
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+// --- CORS Configuration ---
+// Get your Vercel URL (e.g., https://my-app.vercel.app)
+const allowedOrigins = ['http://localhost:5173', 'https://guide-tracker-app.vercel.app/'];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+};
+
 // --- Middleware ---
-// Enable CORS (Cross-Origin Resource Sharing) so our frontend can call the API
-app.use(cors());
+app.use(cors(corsOptions)); // Use the new options
 // Enable the Express server to understand incoming JSON data
 app.use(express.json({ limit: '5mb' })); // Allow larger text inputs
 
@@ -24,3 +37,5 @@ app.use('/api', apiRoutes);
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+

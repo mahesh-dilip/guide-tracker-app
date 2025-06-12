@@ -10,7 +10,7 @@ async function getStructuredGuide(rawText) {
   // This is the detailed prompt we send to the AI.
   // It tells the AI exactly what to do and what format to use.
   const prompt = `
-YouYou are a master content analysis and structuring engine. Your primary function is to meticulously analyze user-submitted text, which may be in any language, and transform it into a precise, well-structured JSON object that strictly follows the required schema.
+You are a master content analysis and structuring engine. Your primary function is to meticulously analyze user-submitted text, which may be in any language, and transform it into a precise, well-structured JSON object that strictly follows the required schema.
 
 **Analysis & Transformation Rules:**
 
