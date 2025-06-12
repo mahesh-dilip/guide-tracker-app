@@ -9,22 +9,24 @@ import apiRoutes from './routes/api.js';
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-// --- CORS Configuration ---
-// Get your Vercel URL (e.g., https://my-app.vercel.app)
-const allowedOrigins = ['http://localhost:5173', 'https://guide-tracker-app.vercel.app/'];
+// --- IMPORTANT: CORS Configuration ---
 
+// This setup is more robust for deployment.
+// It explicitly tells the server to trust requests from your Vercel URL.
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  // Replace this with your actual Vercel frontend URL
+  origin: 'https://guide-tracker-app.vercel.app/', 
+  optionsSuccessStatus: 200 // For legacy browser support
 };
 
-// --- Middleware ---
-app.use(cors(corsOptions)); // Use the new options
+// Use the CORS middleware with our options
+app.use(cors(corsOptions));
+
+// This handles the "preflight" request that browsers send for complex requests (like POST)
+app.options('*', cors(corsOptions)); 
+
+// --- End of CORS Configuration ---
+
 // Enable the Express server to understand incoming JSON data
 app.use(express.json({ limit: '5mb' })); // Allow larger text inputs
 
