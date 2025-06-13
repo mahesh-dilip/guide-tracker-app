@@ -8,13 +8,14 @@ const RENDER_BACKEND_URL = import.meta.env.VITE_API_BASE_URL;
 const API_URL = RENDER_BACKEND_URL ? `${RENDER_BACKEND_URL}/api` : '/api';
 
 export const createGuideFromText = (rawContent) => {
-    // Correct endpoint is /guides
-    return axios.post(`${API_URL}/guides`, { rawContent });
+    // Correct endpoint should be /guides/from-text
+    return axios.post(`${API_URL}/guides/from-text`, { rawContent });
 };
 
 export const createGuideFromAudio = (audioFile) => {
     const formData = new FormData();
     formData.append('audio', audioFile);
+    // Correct endpoint should be /guides/from-audio
     return axios.post(`${API_URL}/guides/from-audio`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
