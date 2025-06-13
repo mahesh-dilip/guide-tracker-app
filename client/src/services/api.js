@@ -14,7 +14,7 @@ export const createGuideFromText = (rawContent) => {
 
 export const createGuideFromAudio = (audioFile) => {
     const formData = new FormData();
-    formData.append('audio', audioFile); // Key 'audio' must match backend
+    formData.append('audio', audioFile);
     return axios.post(`${API_URL}/guides/from-audio`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
@@ -43,7 +43,6 @@ export const addAttachment = (guideId, stepId, file) => {
 };
 
 export const exportGuideAs = (guideId, format) => {
-    // We expect a file back, so the responseType must be 'blob'
     return axios.get(`${API_URL}/guides/${guideId}/export?format=${format}`, {
         responseType: 'blob',
     });

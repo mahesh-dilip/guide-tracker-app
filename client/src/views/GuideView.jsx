@@ -171,8 +171,8 @@ const GuideView = () => {
                     </Badge>
 
                     {/* Centralized Progress Bar */}
-                    <div className="mb-6">
-                        <ProgressBar value={guide.progress} />
+            <div className="mb-6">
+                <ProgressBar value={guide.progress} />
                         <p className="text-right text-sm text-slate-600 mt-1">{Math.round(guide.progress || 0)}% Complete</p>
                     </div>
                 </div>
@@ -180,23 +180,23 @@ const GuideView = () => {
 
             {/* Main Content */}
             <div className="p-4 sm:p-8 pt-0">
-                {guide.chapters.map((chapter, chapterIndex) => (
+            {guide.chapters.map((chapter, chapterIndex) => (
                     <div key={chapter.id || chapterIndex} className="mb-12">
                         <h2 className="text-2xl font-bold text-blue-800 border-b-2 border-blue-500 pb-2 mb-6">{chapter.title}</h2>
                         <ul className="space-y-8">
-                            {chapter.steps.map((step) => (
+                        {chapter.steps.map((step) => (
                                 <li key={step.id} className={`bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow ${step.isCompleted ? 'opacity-60' : ''}`}>
-                                    <label className="flex items-start cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={!!step.isCompleted}
-                                            onChange={() => handleToggleStep(step.id)}
-                                            className="h-6 w-6 border-gray-300 rounded text-blue-600 focus:ring-blue-500 mt-1"
-                                        />
-                                        <span className={`ml-4 text-lg ${step.isCompleted ? 'text-gray-500 line-through' : 'text-gray-800'}`}>
-                                            {step.content}
-                                        </span>
-                                    </label>
+                                <label className="flex items-start cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={!!step.isCompleted}
+                                        onChange={() => handleToggleStep(step.id)}
+                                        className="h-6 w-6 border-gray-300 rounded text-blue-600 focus:ring-blue-500 mt-1"
+                                    />
+                                    <span className={`ml-4 text-lg ${step.isCompleted ? 'text-gray-500 line-through' : 'text-gray-800'}`}>
+                                        {step.content}
+                                    </span>
+                                </label>
                                     
                                     {/* Notes & Attachments Section */}
                                     <div className="ml-10 mt-6 pl-4 border-l-2 border-gray-200">
@@ -258,18 +258,18 @@ const GuideView = () => {
                                                     {/* Notes Section */}
                                                     <div>
                                                         <h4 className="font-semibold text-slate-700 text-base mb-2">Notes:</h4>
-                                                        {step.notes && step.notes.length > 0 ? (
+                                    {step.notes && step.notes.length > 0 ? (
                                                             <ul className="list-disc list-inside mt-2 text-slate-700">
-                                                                {step.notes.map((note) => (
-                                                                    <li key={note.id} className="text-sm mb-1">{note.content}</li>
-                                                                ))}
-                                                            </ul>
+                                            {step.notes.map((note) => (
+                                                <li key={note.id} className="text-sm mb-1">{note.content}</li>
+                                            ))}
+                                        </ul>
                                                         ) : <p className="text-sm text-slate-500 mt-1">No notes yet.</p>}
-                                                        <div className="mt-4 flex items-center gap-2">
+                                    <div className="mt-4 flex items-center gap-2">
                                                             <Textarea
-                                                                value={noteInputs[step.id] || ''}
-                                                                onChange={(e) => handleNoteInputChange(step.id, e.target.value)}
-                                                                placeholder="Add a new note..."
+                                            value={noteInputs[step.id] || ''}
+                                            onChange={(e) => handleNoteInputChange(step.id, e.target.value)}
+                                            placeholder="Add a new note..."
                                                                 className="w-full text-base border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 py-3 px-4 resize-none min-h-[50px]"
                                                             />
                                                             <Button
@@ -319,12 +319,12 @@ const GuideView = () => {
                                                 </>
                                             )}
                                         </div>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                ))}
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            ))}
             </div>
             </div>
         </div>
