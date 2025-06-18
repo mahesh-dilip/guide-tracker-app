@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getGuide, toggleStep, addNote, addAttachment, exportGuideAs } from '../services/api';
 import ProgressBar from '../components/ProgressBar';
+import Chatbot from '../components/Chatbot';
+import IngredientsChecklist from '../components/IngredientsChecklist';
 
 // Import the UI components we just added
 import { Button } from "../components/ui/button"
@@ -22,12 +24,19 @@ const GuideView = () => {
     const [exportingFormat, setExportingFormat] = useState(null);
     const fileInputRef = useRef({});
     const [addingNoteStepId, setAddingNoteStepId] = useState(null);
+    const [currentStepId, setCurrentStepId] = useState(null);
 
     const fetchGuide = useCallback(async () => {
         setIsLoading(true);
         try {
             const response = await getGuide(guideId);
-            setGuide(response.data);
+            const fetchedGuide = response.data;
+            setGuide(fetchedGuide);
+            
+            // Set the currentStepId to the first step as soon as guide loads
+            if (fetchedGuide.chapters?.[0]?.steps?.[0]) {
+                setCurrentStepId(fetchedGuide.chapters[0].steps[0].id);
+            }
         } catch (err) {
             setError('Could not fetch the guide. Does it exist?');
             console.error(err);
@@ -132,6 +141,9 @@ const GuideView = () => {
     if (error) return <div className="p-8 text-red-500 text-center">{error}</div>;
     if (!guide) return <div className="p-8 text-center">No guide data found.</div>;
 
+    // Check if this is a recipe guide
+    const isRecipe = guide.contentType === 'RECIPE';
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 md:p-8 font-sans">
             <div className="mx-auto max-w-4xl">
@@ -180,7 +192,15 @@ const GuideView = () => {
 
             {/* Main Content */}
             <div className="p-4 sm:p-8 pt-0">
-            {guide.chapters.map((chapter, chapterIndex) => (
+                {/* Recipe Layout - Show ingredients first, then instructions */}
+                {isRecipe && guide.ingredients && (
+                    <div className="mb-8">
+                        <IngredientsChecklist ingredients={guide.ingredients} />
+                    </div>
+                )}
+
+                {/* Regular guide content */}
+                {guide.chapters.map((chapter, chapterIndex) => (
                     <div key={chapter.id || chapterIndex} className="mb-12">
                         <h2 className="text-2xl font-bold text-blue-800 border-b-2 border-blue-500 pb-2 mb-6">{chapter.title}</h2>
                         <ul className="space-y-8">
@@ -193,7 +213,10 @@ const GuideView = () => {
                                         onChange={() => handleToggleStep(step.id)}
                                         className="h-6 w-6 border-gray-300 rounded text-blue-600 focus:ring-blue-500 mt-1"
                                     />
-                                    <span className={`ml-4 text-lg ${step.isCompleted ? 'text-gray-500 line-through' : 'text-gray-800'}`}>
+                                    <span 
+                                        className={`ml-4 text-lg ${step.isCompleted ? 'text-gray-500 line-through' : 'text-gray-800'}`}
+                                        onClick={() => setCurrentStepId(step.id)}
+                                    >
                                         {step.content}
                                     </span>
                                 </label>
@@ -327,6 +350,9 @@ const GuideView = () => {
             ))}
             </div>
             </div>
+            
+            {/* Chatbot Component */}
+            <Chatbot guideId={guideId} currentStepId={currentStepId} />
         </div>
     );
 };

@@ -47,4 +47,9 @@ export const exportGuideAs = (guideId, format) => {
     return axios.get(`${API_URL}/guides/${guideId}/export?format=${format}`, {
         responseType: 'blob',
     });
+};
+
+// --- NEW FUNCTION ---
+export const askQuestion = (guideId, question, currentStepId) => {
+    return axios.post(`${API_URL}/guides/${guideId}/ask`, { question, currentStepId });
 }; 

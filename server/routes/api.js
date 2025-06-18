@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { createGuide, getGuideById, createGuideFromAudio, exportGuide } from '../controllers/guideController.js';
+import { createGuide, getGuideById, createGuideFromAudio, exportGuide, askQuestionAboutGuide } from '../controllers/guideController.js';
 import { toggleStepCompletion, addNoteToStep, addAttachmentToStep } from '../controllers/stepController.js';
 
 // Create a new router object
@@ -19,6 +19,9 @@ router.post('/guides/from-text', createGuide); // Renamed for clarity
 router.get('/guides/:guideId', getGuideById);
 router.get('/guides/:guideId/export', exportGuide);
 router.post('/guides/from-audio', upload.single('audio'), createGuideFromAudio);
+
+// --- NEW CHATBOT ROUTE ---
+router.post('/guides/:guideId/ask', askQuestionAboutGuide);
 
 // Step routes
 router.put('/guides/:guideId/steps/:stepId/complete', toggleStepCompletion);

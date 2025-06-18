@@ -1,4 +1,4 @@
-import { getStructuredGuide } from '../services/geminiService.js';
+import { getStructuredGuide, askAboutGuide } from '../services/geminiService.js';
 import { transcribeAudio } from '../services/elevenLabsService.js';
 import { db } from '../services/firebaseService.js';
 import { v4 as uuidv4 } from 'uuid';
@@ -159,5 +159,52 @@ export async function createGuideFromAudio(req, res) {
   } catch (error) {
     console.error("Error creating guide from audio:", error);
     res.status(500).send({ message: "Failed to create guide from audio.", error: error.message });
+  }
+}
+
+// --- NEW FUNCTION ---
+// This is the controller logic for the chatbot
+export async function askQuestionAboutGuide(req, res) {
+  try {
+    const { guideId } = req.params;
+    const { question, currentStepId } = req.body;
+
+    if (!question || !currentStepId) {
+      return res.status(400).send({ message: "A question and currentStepId are required." });
+    }
+
+    // 1. Fetch the entire guide from Firestore to get the context
+    const doc = await db.collection('guides').doc(guideId).get();
+    if (!doc.exists) {
+      return res.status(404).send({ message: "Guide not found." });
+    }
+    const guideData = doc.data();
+
+    // 2. Find the text content of the user's current step
+    let currentStepContent = "Could not determine current step.";
+    guideData.chapters.forEach(chapter => {
+      const foundStep = chapter.steps.find(step => step.id === currentStepId);
+      if (foundStep) {
+        currentStepContent = foundStep.content;
+      }
+    });
+
+    // 3. Assemble the full context packet to send to the AI
+    const guideContext = {
+      originalContent: guideData.originalContent,
+      chapters: guideData.chapters,
+      currentStepContent: currentStepContent,
+      question: question,
+    };
+
+    // 4. Call our Gemini service to get the answer
+    const answer = await askAboutGuide(guideContext);
+
+    // 5. Send the AI's answer back to the frontend
+    res.status(200).send({ answer: answer });
+
+  } catch (error) {
+    console.error("Error in askQuestionAboutGuide controller:", error);
+    res.status(500).send({ message: "Failed to get an answer.", error: error.message });
   }
 }
