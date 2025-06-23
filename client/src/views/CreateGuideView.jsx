@@ -136,7 +136,7 @@ export default function CreateGuideView() {
                   <p className="text-sm text-slate-500">Supports MP3, WAV, M4A files up to 50MB</p>
                   <input
                     type="file"
-                    accept="audio/*"
+                    accept="audio/*,.mp3,.mp4,.mpeg,.mpga,.m4a,.wav,.webm,.opus"
                     ref={fileInputRef}
                     onChange={handleFileChange}
                     className="hidden"
