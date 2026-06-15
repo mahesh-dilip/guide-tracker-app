@@ -1,3 +1,5 @@
+[![CI](https://github.com/mahesh-dilip/guide-tracker-app/actions/workflows/ci.yml/badge.svg)](https://github.com/mahesh-dilip/guide-tracker-app/actions/workflows/ci.yml)
+
 # Guide Tracker
 
 **Turn any text or voice recording into a structured, step-by-step guide you can follow, annotate, ask questions about, and export.**
