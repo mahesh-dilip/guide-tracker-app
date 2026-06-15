@@ -1,3 +1,11 @@
+# --- Secrets & credentials (NEVER commit these) ---
+.env
+.env.*
+!.env.example
+*serviceAccountKey*.json
+serviceAccountKey.json
+server/serviceAccountKey.json
+
 # Logs
 logs
 *.log
