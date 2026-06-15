@@ -1,20 +1,6 @@
 import { db, bucket } from '../services/firebaseService.js';
 import { v4 as uuidv4 } from 'uuid';
-
-// This is a helper function to recalculate the overall progress of a guide.
-function calculateProgress(guide) {
-    let completedSteps = 0;
-    let totalSteps = 0;
-    guide.chapters.forEach(chapter => {
-        totalSteps += chapter.steps.length;
-        chapter.steps.forEach(step => {
-            if (step.isCompleted) {
-                completedSteps++;
-            }
-        });
-    });
-    return totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0;
-}
+import { calculateProgress } from '../services/guideUtils.js';
 
 // Handles toggling the completion status of a step
 export async function toggleStepCompletion(req, res) {
